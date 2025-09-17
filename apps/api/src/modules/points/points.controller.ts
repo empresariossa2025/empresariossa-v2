@@ -1,98 +1,147 @@
-import { Controller, Get, Query } from '@nestjs/common'
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common'
+import { PointsEngineService } from './points-engine.service'
+import { PointCategory, PointTransactionType } from '@prisma/client'
 
 @Controller('points')
 export class PointsController {
-  @Get('test')
-  async test() {
-    return { 
-      message: 'Points module is working!', 
-      timestamp: new Date()
-    }
+  constructor(private pointsEngine: PointsEngineService) {}
+
+  @Get('member/:memberId')
+  async getMemberPoints(@Param('memberId') memberId: string) {
+    return this.pointsEngine.getMemberPoints(memberId)
   }
 
   @Get('leaderboard')
   async getLeaderboard(@Query('limit') limit?: string) {
-    // Mock data per ora
-    return [
-      {
-        id: '1',
-        memberId: 'mock-1',
-        totalPoints: 850,
-        monthlyPoints: 120,
-        member: {
-          id: 'mock-1',
-          firstName: 'João',
-          lastName: 'Silva',
-          email: 'joao@example.com'
-        }
-      },
-      {
-        id: '2', 
-        memberId: 'mock-2',
-        totalPoints: 720,
-        monthlyPoints: 95,
-        member: {
-          id: 'mock-2',
-          firstName: 'Maria',
-          lastName: 'Santos',
-          email: 'maria@example.com'
-        }
-      },
-      {
-        id: '3',
-        memberId: 'mock-3', 
-        totalPoints: 650,
-        monthlyPoints: 80,
-        member: {
-          id: 'mock-3',
-          firstName: 'Pedro',
-          lastName: 'Costa',
-          email: 'pedro@example.com'
-        }
-      }
-    ]
+    const limitNum = limit ? parseInt(limit) : 10
+    return this.pointsEngine.getPointsLeaderboard(limitNum)
   }
 
-  @Get('member/:memberId')
-  async getMemberPoints() {
-    return {
-      id: '1',
-      memberId: 'mock-1',
-      totalPoints: 850,
-      monthlyPoints: 120,
-      yearlyPoints: 580,
-      member: {
-        id: 'mock-1',
-        firstName: 'João',
-        lastName: 'Silva',
-        email: 'joao@example.com'
-      },
-      transactions: [
-        {
-          id: '1',
-          points: 30,
-          type: 'EARNED',
-          category: 'MEETING',
-          description: 'Reunião individual completada',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '2', 
-          points: 100,
-          type: 'EARNED',
-          category: 'RECOMMENDATION',
-          description: 'Recomendação fechada com sucesso',
-          createdAt: new Date(Date.now() - 86400000).toISOString()
-        },
-        {
-          id: '3',
-          points: -30,
-          type: 'PENALTY', 
-          category: 'ATTENDANCE',
-          description: 'Penalidade por ausência',
-          createdAt: new Date(Date.now() - 172800000).toISOString()
-        }
-      ]
-    }
+  @Post('award')
+  async awardPoints(@Body() data: {
+    memberId: string
+    points: number
+    category: PointCategory
+    description?: string
+    metadata?: any
+  }) {
+    return this.pointsEngine.awardPoints(
+      data.memberId,
+      data.points,
+      data.category,
+      PointTransactionType.EARNED,
+      data.description,
+      data.metadata
+    )
+  }
+
+  @Post('penalize')
+  async penalizePoints(@Body() data: {
+    memberId: string
+    points: number
+    category: PointCategory
+    description: string
+    metadata?: any
+  }) {
+    return this.pointsEngine.penalizePoints(
+      data.memberId,
+      data.points,
+      data.category,
+      data.description,
+      data.metadata
+    )
+  }
+
+  @Post('audit/:month/:year')
+  async performMonthlyAudit(
+    @Param('month') month: string,
+    @Param('year') year: string
+  ) {
+    return this.pointsEngine.performMonthlyAudit(
+      parseInt(month),
+      parseInt(year)
+    )
+  }
+
+  // Trigger endpoints per testing
+  @Post('trigger/meeting-completed')
+  async triggerMeetingCompleted(@Body() data: { meetingId: string; memberId: string }) {
+    return this.pointsEngine.handleMeetingCompleted(data.meetingId, data.memberId)
+  }
+
+  @Post('trigger/visitor-brought')
+  async triggerVisitorBrought(@Body() data: { visitId: string; hostId: string }) {
+    return this.pointsEngine.handleVisitorBrought(data.visitId, data.hostId)
+  }
+
+  @Post('trigger/recommendation-made')
+  async triggerRecommendationMade(@Body() data: { recommendationId: string; recommenderId: string }) {
+    return this.pointsEngine.handleRecommendationMade(data.recommendationId, data.recommenderId)
+  }
+
+  @Post('trigger/recommendation-closed')
+  async triggerRecommendationClosed(@Body() data: { 
+    recommendationId: string
+    recommenderId: string
+    amount?: number
+  }) {
+    return this.pointsEngine.handleRecommendationClosed(
+      data.recommendationId,
+      data.recommenderId,
+      data.amount
+    )
+  }
+
+  @Post('trigger/business-deal-completed')
+  async triggerBusinessDealCompleted(@Body() data: {
+    dealId: string
+    sellerId: string
+    buyerId: string
+    amount: number
+  }) {
+    return this.pointsEngine.handleBusinessDealCompleted(
+      data.dealId,
+      data.sellerId,
+      data.buyerId,
+      data.amount
+    )
   }
 }
+
+  @Get('stats/overview')
+  async getPointsOverview() {
+    const [totalMembers, totalPoints, monthlyAverage] = await Promise.all([
+      this.prisma.memberPoints.count(),
+      this.prisma.memberPoints.aggregate({
+        _sum: { totalPoints: true }
+      }),
+      this.prisma.memberPoints.aggregate({
+        _avg: { monthlyPoints: true }
+      })
+    ])
+
+    return {
+      totalMembers,
+      totalPoints: totalPoints._sum.totalPoints || 0,
+      monthlyAverage: Math.round(monthlyAverage._avg.monthlyPoints || 0)
+    }
+  }
+
+  @Get('activity/recent')
+  async getRecentActivity(@Query('limit') limit?: string) {
+    const limitNum = limit ? parseInt(limit) : 20
+    
+    return this.prisma.pointTransaction.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: limitNum,
+      include: {
+        member: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        }
+      }
+    })
+  }

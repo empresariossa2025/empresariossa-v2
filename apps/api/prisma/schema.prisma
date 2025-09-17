@@ -28,6 +28,12 @@ model User {
   classes       ClassEnrollment[]
   comments      ClassComment[]
   documents     Document[]
+  memberPoints  MemberPoints?
+  pointTransactions PointTransaction[]
+  memberMetrics MemberMetrics?
+  meetings      Meeting[]
+  memberVisits  MemberVisit[]
+  recommendations Recommendation[]
 }
 
 model Organization {
@@ -110,6 +116,7 @@ model Event {
   id          String          @id @default(uuid())
   title       String
   description String?
+  metadata     Json?
   startDate   DateTime
   endDate     DateTime
   location    String?
@@ -136,6 +143,7 @@ model Class {
   id          String            @id @default(uuid())
   title       String
   description String?
+  metadata     Json?
   content     String?
   videoUrl    String?
   duration    Int?
@@ -215,4 +223,118 @@ enum AttendeeStatus {
   CONFIRMED
   ATTENDED
   CANCELLED
+}
+
+enum PointCategory {
+  ATTENDANCE
+  MEETING
+  VISITOR
+  RECOMMENDATION
+  BUSINESS_DEAL
+}
+
+enum PointTransactionType {
+  EARNED
+  PENALTY
+  BONUS
+}
+
+model MemberPoints {
+  id           String @id @default(uuid())
+  memberId     String
+  totalPoints  Int    @default(0)
+  monthlyPoints Int   @default(0)
+  yearlyPoints  Int    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  member       User @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@unique([memberId])
+  @@map("member_points")
+}
+
+model PointTransaction {
+  id          String              @id @default(uuid())
+  memberId    String
+  points      Int
+  category    PointCategory
+  type        PointTransactionType
+  description String?
+  metadata     Json?
+  createdAt   DateTime            @default(now())
+  
+  member      User                @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@map("point_transactions")
+}
+
+model Meeting {
+  id          String   @id @default(uuid())
+  memberId    String
+  date        DateTime
+  type        String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  
+  member      User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@map("meetings")
+}
+
+model MemberVisit {
+  id          String   @id @default(uuid())
+  memberId    String
+  visitorName String
+  visitDate   DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+  
+  member      User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@map("member_visits")
+}
+
+model Recommendation {
+  id          String    @id @default(uuid())
+  memberId    String
+  recommendedName  String
+  recommendedEmail String?
+  status      String    @default("PENDING")
+  closedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  
+  member      User      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@map("recommendations")
+}
+
+
+
+model PointRule {
+  id          String   @id @default(uuid())
+  name        String
+  minimal     String?
+  type        Int      @default(2)
+  items       Int      @default(1) 
+  points      Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  @@map("point_rules")
+}
+
+model MemberMetrics {
+  id          String   @id @default(uuid())
+  memberId    String   @unique
+  eventsAttended    Int @default(0)
+  meetingsHeld      Int @default(0)
+  visitorsReferred  Int @default(0)
+  recommendationsMade Int @default(0)
+  recommendationsClosed Int @default(0)
+  lastUpdated  DateTime @default(now())
+  
+  member       User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  
+  @@map("member_metrics")
 }
