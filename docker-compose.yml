@@ -1,0 +1,85 @@
+version: '3.9'
+
+services:
+  # Database
+  emp_postgres:
+    image: postgres:16-alpine
+    container_name: emp_postgres
+    environment:
+      POSTGRES_DB: empresariossa
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dev2025
+    ports:
+      - "5532:5432"
+    volumes:
+      - emp_postgres_data:/var/lib/postgresql/data
+    networks:
+      - emp_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  emp_redis:
+    image: redis:7-alpine
+    container_name: emp_redis
+    command: redis-server --appendonly yes --requirepass dev2025
+    ports:
+      - "5579:6379"
+    volumes:
+      - emp_redis_data:/data
+    networks:
+      - emp_network
+
+  # MinIO (S3 local)
+  emp_minio:
+    image: minio/minio:latest
+    container_name: emp_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: minio2025
+    ports:
+      - "5590:9000"  # API
+      - "5591:9001"  # Console
+    volumes:
+      - emp_minio_data:/data
+    networks:
+      - emp_network
+
+  # Mailhog (email testing)
+  emp_mailhog:
+    image: mailhog/mailhog:latest
+    container_name: emp_mailhog
+    ports:
+      - "5525:1025"  # SMTP
+      - "5526:8025"  # Web UI
+    networks:
+      - emp_network
+
+  # PgAdmin (opcional)
+  emp_pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: emp_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@empresariossa.com
+      PGADMIN_DEFAULT_PASSWORD: pgadmin2025
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5550:80"
+    networks:
+      - emp_network
+    profiles:
+      - tools
+
+networks:
+  emp_network:
+    driver: bridge
+    name: empresariossa_network
+
+volumes:
+  emp_postgres_data:
+  emp_redis_data:
+  emp_minio_data:

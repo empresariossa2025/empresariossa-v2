@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String
+  firstName     String
+  lastName      String
+  cpf           String?   @unique
+  cnpj          String?   @unique
+  role          UserRole  @default(USER)
+  isActive      Boolean   @default(true)
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  organizations OrganizationMember[]
+  contracts     Contract[]
+  charges       Charge[]
+  events        EventAttendee[]
+  classes       ClassEnrollment[]
+  comments      ClassComment[]
+  documents     Document[]
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  cnpj      String   @unique
+  email     String
+  phone     String
+  address   String
+  city      String
+  state     String
+  zipCode   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  members   OrganizationMember[]
+  contracts Contract[]
+  branches  Branch[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  userId         String
+  organizationId String
+  role           MemberRole   @default(MEMBER)
+  joinedAt       DateTime     @default(now())
+  
+  user           User         @relation(fields: [userId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  
+  @@unique([userId, organizationId])
+}
+
+model Branch {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  address        String
+  city           String
+  state          String
+  zipCode        String
+  createdAt      DateTime     @default(now())
+  
+  organization   Organization @relation(fields: [organizationId], references: [id])
+}
+
+model Contract {
+  id             String         @id @default(uuid())
+  organizationId String
+  userId         String
+  number         String         @unique
+  status         ContractStatus @default(DRAFT)
+  startDate      DateTime
+  endDate        DateTime?
+  value          Decimal        @db.Decimal(10,2)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+  charges        Charge[]
+}
+
+model Charge {
+  id         String       @id @default(uuid())
+  contractId String
+  userId     String
+  amount     Decimal      @db.Decimal(10,2)
+  dueDate    DateTime
+  paidAt     DateTime?
+  status     ChargeStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+  
+  contract   Contract     @relation(fields: [contractId], references: [id])
+  user       User         @relation(fields: [userId], references: [id])
+}
+
+model Event {
+  id          String          @id @default(uuid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  location    String?
+  capacity    Int?
+  createdAt   DateTime        @default(now())
+  
+  attendees   EventAttendee[]
+}
+
+model EventAttendee {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  status    AttendeeStatus @default(REGISTERED)
+  createdAt DateTime @default(now())
+  
+  event     Event    @relation(fields: [eventId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  
+  @@unique([eventId, userId])
+}
+
+model Class {
+  id          String            @id @default(uuid())
+  title       String
+  description String?
+  content     String?
+  videoUrl    String?
+  duration    Int?
+  createdAt   DateTime          @default(now())
+  
+  enrollments ClassEnrollment[]
+  comments    ClassComment[]
+}
+
+model ClassEnrollment {
+  id         String   @id @default(uuid())
+  classId    String
+  userId     String
+  progress   Int      @default(0)
+  completedAt DateTime?
+  createdAt  DateTime @default(now())
+  
+  class      Class    @relation(fields: [classId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+  
+  @@unique([classId, userId])
+}
+
+model ClassComment {
+  id        String   @id @default(uuid())
+  classId   String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  
+  class     Class    @relation(fields: [classId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  userId    String
+  fileName  String
+  fileKey   String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  COMPLETED
+}
+
+enum ChargeStatus {
+  PENDING
+  PROCESSING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+enum AttendeeStatus {
+  REGISTERED
+  CONFIRMED
+  ATTENDED
+  CANCELLED
+}

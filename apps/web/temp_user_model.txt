@@ -1,0 +1,47 @@
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  firstName   String
+  lastName    String
+  cpf         String?   @unique
+  cnpj        String?   @unique
+  phone       String?
+  dateOfBirth DateTime?
+  isActive    Boolean   @default(true)
+  role        UserRole  @default(USER)
+  passwordHash String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relazioni esistenti
+  organizationMemberships OrganizationMember[]
+  ownedOrganizations      Organization[] @relation("OrganizationOwner")
+  managedOrganizations    Organization[] @relation("OrganizationManager")
+  eventAttendees          EventAttendee[]
+  classEnrollments        ClassEnrollment[]
+  documents               Document[]
+  
+  // Sistema punti
+  memberPoints      MemberPoints?
+  pointTransactions PointTransaction[]
+  memberMetrics     MemberMetrics[]
+  
+  // Business deals
+  businessDealsSeller BusinessDeal[] @relation("BusinessDealsSeller")
+  businessDealsBuyer  BusinessDeal[] @relation("BusinessDealsBuyer")
+  
+  // Raccomandazioni  
+  recommendationsMade     Recommendation[] @relation("RecommendationsMade")
+  recommendationsReceived Recommendation[] @relation("RecommendationsReceived")
+  recommendationsTarget   Recommendation[] @relation("RecommendationsTarget")
+  
+  // Visite e meetings
+  memberVisits      MemberVisit[]
+  meetingsAsParticipant Meeting[] @relation("MeetingParticipant")
+  meetingsAsFacilitator Meeting[] @relation("MeetingFacilitator")
+  
+  // Presenze eventi
+  eventAttendances  EventAttendance[]
+
+  @@map("users")
+}
