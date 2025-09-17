@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common'
-import { PointsEngineService } from './points-engine.service'
 import { PointsController } from './points.controller'
+import { PointsService } from './points.service'
 import { DatabaseModule } from '../../core/database/database.module'
 
 @Module({
   imports: [DatabaseModule],
-  providers: [PointsEngineService],
+  providers: [PointsService],
   controllers: [PointsController],
-  exports: [PointsEngineService]
+  exports: [PointsService]
 })
 export class PointsModule {}
