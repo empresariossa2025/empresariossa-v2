@@ -22,14 +22,18 @@ Modern full-stack business networking platform for CNE with complete gamificatio
 - Responsive modern UI
 
 ## Quick Start
+
 ```bash
 # Clone and start
 git clone https://github.com/empresariossa2025/empresariossa-v2.git
 cd empresariossa-v2
 docker-compose up -d
+
 # Access
 # Frontend: http://localhost:3000
 # Backend: http://localhost:5500
-'''
-## Statu
+```
+
+## Status
+
 Production-ready enterprise application - 100% complete
