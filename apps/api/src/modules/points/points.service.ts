@@ -5,17 +5,13 @@ import { PointCategory, PointTransactionType } from '@prisma/client'
 @Injectable()
 export class PointsService {
   private readonly logger = new Logger(PointsService.name)
-
+  
   constructor(private prisma: PrismaService) {}
 
   // ========================
   // CORE BUSINESS RULES - Sistema Caminho do Sucesso
   // ========================
 
-  /**
-   * Regra 1: PRESENÇA - Mínimo 75% de presença
-   * Se < 75% = -30 pontos por evento perdido
-   */
   async processAttendancePenalty(memberId: string, eventId: string) {
     await this.awardPoints({
       memberId,
@@ -25,14 +21,9 @@ export class PointsService {
       description: `Penalidade por ausência no evento ${eventId}`,
       metadata: { eventId, rule: 'attendance_penalty' }
     })
-
     this.logger.log(`Applied attendance penalty: Member ${memberId} lost 30 points`)
   }
 
-  /**
-   * Regra 2: REUNIÃO INDIVIDUAL - Mínimo 3 por mês
-   * +30 pontos por reunião realizada
-   */
   async processIndividualMeeting(memberId: string, meetingId: string) {
     await this.awardPoints({
       memberId,
@@ -42,152 +33,127 @@ export class PointsService {
       description: `Reunião individual realizada`,
       metadata: { meetingId, rule: 'individual_meeting' }
     })
-
-    this.logger.log(`Meeting points awarded: Member ${memberId} earned 30 points`)
+    this.logger.log(`Individual meeting points awarded: Member ${memberId} gained 30 points`)
   }
 
-  /**
-   * Regra 3: VISITANTES - Mínimo 1 por mês
-   * +30 pontos por visitante trazido
-   */
   async processVisitorReferred(memberId: string, visitorName: string) {
     await this.awardPoints({
       memberId,
       points: 30,
       category: PointCategory.VISITOR,
       type: PointTransactionType.EARNED,
-      description: `Visitante trazido: ${visitorName}`,
+      description: `Visitante referido: ${visitorName}`,
       metadata: { visitorName, rule: 'visitor_referred' }
     })
-
-    this.logger.log(`Visitor points awarded: Member ${memberId} earned 30 points`)
+    this.logger.log(`Visitor referral points awarded: Member ${memberId} gained 30 points`)
   }
 
-  /**
-   * Regra 4: RECOMENDAÇÃO PARA MEMBROS - Mínimo 3 por mês
-   * +30 pontos por recomendação feita
-   */
-  async processRecommendationMade(memberId: string, recommendedName: string, recommendedEmail?: string) {
+  async processRecommendationMade(memberId: string, recommendedName: string) {
     await this.awardPoints({
       memberId,
       points: 30,
       category: PointCategory.RECOMMENDATION,
       type: PointTransactionType.EARNED,
-      description: `Recomendação para membro: ${recommendedName}`,
-      metadata: { recommendedName, recommendedEmail, rule: 'recommendation_made' }
+      description: `Recomendação: ${recommendedName}`,
+      metadata: { recommendedName, rule: 'recommendation_made' }
     })
-
-    this.logger.log(`Recommendation points awarded: Member ${memberId} earned 30 points`)
+    this.logger.log(`Recommendation points awarded: Member ${memberId} gained 30 points`)
   }
 
-  /**
-   * Regra 5: RECOMENDAÇÃO FECHADA - Sem mínimo
-   * +100 pontos quando recomendação vira membro
-   */
   async processRecommendationClosed(memberId: string, newMemberName: string) {
     await this.awardPoints({
       memberId,
       points: 100,
       category: PointCategory.RECOMMENDATION,
       type: PointTransactionType.BONUS,
-      description: `Recomendação fechada: ${newMemberName} virou membro`,
+      description: `Recomendação fechada: ${newMemberName} se tornou membro`,
       metadata: { newMemberName, rule: 'recommendation_closed' }
     })
-
-    this.logger.log(`Recommendation bonus awarded: Member ${memberId} earned 100 points`)
+    this.logger.log(`Recommendation closure bonus: Member ${memberId} gained 100 points`)
   }
 
-  /**
-   * Regra 6: NEGÓCIO FECHADO - COMPRA
-   * +50 pontos por compra dentro do grupo
-   */
   async processBusinessPurchase(buyerId: string, sellerId: string, amount: number, description: string) {
     await this.awardPoints({
       memberId: buyerId,
       points: 50,
       category: PointCategory.BUSINESS_DEAL,
       type: PointTransactionType.EARNED,
-      description: `Compra realizada: ${description}`,
-      metadata: { sellerId, amount, type: 'purchase', rule: 'business_purchase' }
+      description: `Compra: ${description}`,
+      metadata: { sellerId, amount, rule: 'business_purchase' }
     })
-
-    this.logger.log(`Purchase points awarded: Member ${buyerId} earned 50 points`)
+    this.logger.log(`Business purchase points: Member ${buyerId} gained 50 points`)
   }
 
-  /**
-   * Regra 7: NEGÓCIO FECHADO - VENDA
-   * +25 pontos por venda dentro do grupo
-   */
   async processBusinessSale(sellerId: string, buyerId: string, amount: number, description: string) {
     await this.awardPoints({
       memberId: sellerId,
       points: 25,
       category: PointCategory.BUSINESS_DEAL,
       type: PointTransactionType.EARNED,
-      description: `Venda realizada: ${description}`,
-      metadata: { buyerId, amount, type: 'sale', rule: 'business_sale' }
+      description: `Venda: ${description}`,
+      metadata: { buyerId, amount, rule: 'business_sale' }
     })
-
-    this.logger.log(`Sale points awarded: Member ${sellerId} earned 25 points`)
+    this.logger.log(`Business sale points: Member ${sellerId} gained 25 points`)
   }
 
   // ========================
-  // CORE DATABASE OPERATIONS
+  // CORE TRANSACTION MANAGEMENT - CORRECTED
   // ========================
 
-  private async awardPoints({
-    memberId,
-    points,
-    category,
-    type,
-    description,
-    metadata = {}
-  }: {
-    memberId: string
-    points: number
-    category: PointCategory
-    type: PointTransactionType
-    description?: string
-    metadata?: any
-  }) {
+  private async awardPoints({ memberId, points, category, type, description, metadata = {} }) {
     try {
+      const now = new Date()
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      const startOfYear = new Date(now.getFullYear(), 0, 1)
+
       await this.prisma.$transaction(async (tx) => {
         // 1. Create point transaction
         await tx.pointTransaction.create({
-          data: {
+          data: { memberId, points, category, type, description, metadata }
+        })
+
+        // 2. Recalculate totals from actual transactions
+        const [totalResult, monthlyResult, yearlyResult] = await Promise.all([
+          tx.pointTransaction.aggregate({
+            where: { memberId },
+            _sum: { points: true }
+          }),
+          tx.pointTransaction.aggregate({
+            where: { 
+              memberId,
+              createdAt: { gte: startOfMonth }
+            },
+            _sum: { points: true }
+          }),
+          tx.pointTransaction.aggregate({
+            where: { 
+              memberId,
+              createdAt: { gte: startOfYear }
+            },
+            _sum: { points: true }
+          })
+        ])
+
+        const totalPoints = totalResult._sum.points || 0
+        const monthlyPoints = monthlyResult._sum.points || 0
+        const yearlyPoints = yearlyResult._sum.points || 0
+
+        // 3. Update or create member points with calculated values
+        await tx.memberPoints.upsert({
+          where: { memberId },
+          update: {
+            totalPoints,
+            monthlyPoints,
+            yearlyPoints,
+            updatedAt: now
+          },
+          create: {
             memberId,
-            points,
-            category,
-            type,
-            description,
-            metadata
+            totalPoints,
+            monthlyPoints,
+            yearlyPoints
           }
         })
-
-        // 2. Update or create member points summary
-        const existingMemberPoints = await tx.memberPoints.findUnique({
-          where: { memberId }
-        })
-
-        if (existingMemberPoints) {
-          await tx.memberPoints.update({
-            where: { memberId },
-            data: {
-              totalPoints: existingMemberPoints.totalPoints + points,
-              monthlyPoints: existingMemberPoints.monthlyPoints + points,
-              yearlyPoints: existingMemberPoints.yearlyPoints + points
-            }
-          })
-        } else {
-          await tx.memberPoints.create({
-            data: {
-              memberId,
-              totalPoints: points,
-              monthlyPoints: points,
-              yearlyPoints: points
-            }
-          })
-        }
       })
 
       this.logger.log(`Points transaction completed: Member ${memberId}, Points ${points}, Category ${category}`)
@@ -198,12 +164,9 @@ export class PointsService {
   }
 
   // ========================
-  // QUERY METHODS FOR API
+  // API QUERY METHODS (UNCHANGED)
   // ========================
 
-  /**
-   * Get leaderboard with member info
-   */
   async getLeaderboard(limit: number = 50) {
     return this.prisma.memberPoints.findMany({
       take: limit,
@@ -221,9 +184,6 @@ export class PointsService {
     })
   }
 
-  /**
-   * Get member points detail with recent transactions
-   */
   async getMemberPointsDetail(memberId: string) {
     const [memberPoints, recentTransactions] = await Promise.all([
       this.prisma.memberPoints.findUnique({
@@ -239,7 +199,6 @@ export class PointsService {
           }
         }
       }),
-
       this.prisma.pointTransaction.findMany({
         where: { memberId },
         orderBy: { createdAt: 'desc' },
@@ -253,35 +212,26 @@ export class PointsService {
     }
   }
 
-  /**
-   * Get points overview stats
-   */
   async getPointsOverview() {
-    const [
-      totalMembers,
-      totalPointsSum,
-      averagePoints
-    ] = await Promise.all([
+    const [totalMembersResult, totalPointsResult] = await Promise.all([
       this.prisma.memberPoints.count(),
       this.prisma.memberPoints.aggregate({
         _sum: { totalPoints: true }
-      }),
-      this.prisma.memberPoints.aggregate({
-        _avg: { totalPoints: true }
       })
     ])
 
+    const totalMembers = totalMembersResult
+    const totalPoints = totalPointsResult._sum.totalPoints || 0
+    const averagePoints = totalMembers > 0 ? Math.round(totalPoints / totalMembers) : 0
+
     return {
       totalMembers,
-      totalPoints: totalPointsSum._sum.totalPoints || 0,
-      averagePoints: Math.round(averagePoints._avg.totalPoints || 0),
+      totalPoints,
+      averagePoints,
       timestamp: new Date()
     }
   }
 
-  /**
-   * Get recent point transactions across all members
-   */
   async getRecentActivity(limit: number = 20) {
     return this.prisma.pointTransaction.findMany({
       take: limit,
@@ -298,30 +248,18 @@ export class PointsService {
     })
   }
 
-  // ========================
-  // MONTHLY/YEARLY RESET OPERATIONS
-  // ========================
-
-  /**
-   * Reset monthly points (call via cron job)
-   */
   async resetMonthlyPoints() {
     const result = await this.prisma.memberPoints.updateMany({
       data: { monthlyPoints: 0 }
     })
-
     this.logger.log(`Monthly points reset completed for ${result.count} members`)
     return result
   }
 
-  /**
-   * Reset yearly points (call via cron job)
-   */
   async resetYearlyPoints() {
     const result = await this.prisma.memberPoints.updateMany({
       data: { yearlyPoints: 0 }
     })
-
     this.logger.log(`Yearly points reset completed for ${result.count} members`)
     return result
   }

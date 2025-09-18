@@ -4,6 +4,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { useState, useEffect } from "react"
 import { User } from "@/types"
 import { api } from "@/lib/api"
+import { useThemedStyles } from "@/hooks/use-themed-styles"
 import { Trophy, Target, TrendingUp, Award, Users, Calendar, Star, ArrowUpRight, ArrowDownRight } from "lucide-react"
 
 interface MemberPoints {
@@ -50,6 +51,7 @@ export default function MembrosConrolePontuacaoPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [selectedMember, setSelectedMember] = useState<string>('')
   const [loading, setLoading] = useState(true)
+  const { colors, getCardStyle, theme } = useThemedStyles()
 
   useEffect(() => {
     fetchData()
@@ -61,9 +63,9 @@ export default function MembrosConrolePontuacaoPage() {
       const [leaderboardRes] = await Promise.all([
         api.get('/points/leaderboard?limit=20')
       ])
-      
+
       setLeaderboard(leaderboardRes.data || [])
-      
+
       // Se ci sono membri, seleziona il primo per i dettagli
       if (leaderboardRes.data && leaderboardRes.data.length > 0) {
         setSelectedMember(leaderboardRes.data[0].memberId)
@@ -80,7 +82,17 @@ export default function MembrosConrolePontuacaoPage() {
     try {
       const response = await api.get(`/points/member/${memberId}`)
       if (response.data) {
-        setMemberPoints([response.data])
+        const mappedData = {
+          id: response.data.memberPoints.id,
+          memberId: response.data.memberPoints.memberId,
+          totalPoints: response.data.memberPoints.totalPoints,
+          monthlyPoints: response.data.memberPoints.monthlyPoints,
+          yearlyPoints: response.data.memberPoints.yearlyPoints,
+          lastUpdated: response.data.memberPoints.updatedAt,
+          member: response.data.memberPoints.member,
+          transactions: response.data.recentTransactions || []
+        }
+        setMemberPoints([mappedData])
       }
     } catch (error) {
       console.error('Erro ao carregar detalhes do membro:', error)
@@ -109,6 +121,34 @@ export default function MembrosConrolePontuacaoPage() {
     }
   }
 
+  // ✅ AGGIUNTA: Funzione per ottenere i colori del membro selezionato in base al tema
+  const getSelectedMemberStyle = (isSelected: boolean) => {
+    if (!isSelected) {
+      return {
+        backgroundColor: colors.bg.tertiary,
+        border: '1px solid transparent',
+        textColor: colors.text.primary,
+        subtextColor: colors.text.secondary
+      }
+    }
+
+    if (theme === 'dark') {
+      return {
+        backgroundColor: '#8b5cf640', // Viola con opacità per dark theme
+        border: '1px solid #8b5cf680',
+        textColor: '#e9d5ff', // Testo viola chiaro per buon contrasto
+        subtextColor: '#c4b5fd' // Subtitle viola più chiaro
+      }
+    } else {
+      return {
+        backgroundColor: '#faf5ff', // Viola molto chiaro per light theme
+        border: '1px solid #e9d5ff',
+        textColor: '#7c3aed', // Testo viola scuro per buon contrasto
+        subtextColor: '#8b5cf6' // Subtitle viola medio
+      }
+    }
+  }
+
   const selectedMemberData = memberPoints.find(mp => mp.memberId === selectedMember)
 
   return (
@@ -116,19 +156,21 @@ export default function MembrosConrolePontuacaoPage() {
       <div style={{ padding: '24px' }}>
         {/* Header */}
         <div style={{ marginBottom: '24px' }}>
-          <h1 style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold', 
-            color: '#1e293b', 
+          <h1 style={{
+            fontSize: '28px',
+            fontWeight: 'bold',
+            color: colors.text.primary,
             margin: 0,
-            marginBottom: '8px'
+            marginBottom: '8px',
+            transition: 'color 0.3s ease'
           }}>
             Controle de Pontuação
           </h1>
-          <p style={{ 
-            fontSize: '16px', 
-            color: '#64748b', 
-            margin: 0 
+          <p style={{
+            fontSize: '16px',
+            color: colors.text.secondary,
+            margin: 0,
+            transition: 'color 0.3s ease'
           }}>
             Sistema de gamificação "Caminho do Sucesso"
           </p>
@@ -137,113 +179,117 @@ export default function MembrosConrolePontuacaoPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
           {/* Leaderboard */}
           <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '20px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            border: '1px solid #f1f5f9',
+            ...getCardStyle(),
             height: 'fit-content'
           }}>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '12px', 
-              marginBottom: '20px' 
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '20px'
             }}>
               <Trophy style={{ width: '20px', height: '20px', color: '#f59e0b' }} />
-              <h3 style={{ 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                color: '#1e293b', 
-                margin: 0 
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                color: colors.text.primary,
+                margin: 0,
+                transition: 'color 0.3s ease'
               }}>
                 Ranking Pontos
               </h3>
             </div>
 
             {loading ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+              <div style={{ padding: '40px', textAlign: 'center', color: colors.text.secondary }}>
                 Carregando ranking...
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {leaderboard.map((entry, index) => (
-                  <div 
-                    key={entry.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '12px',
-                      borderRadius: '8px',
-                      backgroundColor: selectedMember === entry.memberId ? '#faf5ff' : '#f8fafc',
-                      border: selectedMember === entry.memberId ? '1px solid #e9d5ff' : '1px solid transparent',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onClick={() => handleMemberSelect(entry.memberId)}
-                    onMouseEnter={(e) => {
-                      if (selectedMember !== entry.memberId) {
-                        e.currentTarget.style.backgroundColor = '#f1f5f9'
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (selectedMember !== entry.memberId) {
-                        e.currentTarget.style.backgroundColor = '#f8fafc'
-                      }
-                    }}
-                  >
-                    <div style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '8px',
-                      backgroundColor: index < 3 ? '#fef3c7' : '#e2e8f0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginRight: '12px'
-                    }}>
-                      <span style={{ 
-                        color: index < 3 ? '#92400e' : '#64748b', 
-                        fontWeight: '600',
-                        fontSize: '12px'
+                {leaderboard.map((entry, index) => {
+                  const isSelected = selectedMember === entry.memberId
+                  const memberStyle = getSelectedMemberStyle(isSelected)
+                  
+                  return (
+                    <div
+                      key={entry.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        backgroundColor: memberStyle.backgroundColor,
+                        border: memberStyle.border,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={() => handleMemberSelect(entry.memberId)}
+                      onMouseEnter={(e) => {
+                        if (!isSelected) {
+                          e.currentTarget.style.backgroundColor = colors.bg.hover
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSelected) {
+                          e.currentTarget.style.backgroundColor = colors.bg.tertiary
+                        }
+                      }}
+                    >
+                      <div style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        backgroundColor: index < 3 ? '#fef3c7' : '#e2e8f0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: '12px'
                       }}>
-                        {index + 1}
-                      </span>
-                    </div>
-                    
-                    <div style={{ flex: 1 }}>
-                      <p style={{ 
-                        fontSize: '14px', 
-                        fontWeight: '500', 
-                        color: '#1e293b', 
-                        margin: 0,
-                        marginBottom: '2px'
-                      }}>
-                        {entry.member.firstName} {entry.member.lastName}
-                      </p>
-                      <p style={{ 
-                        fontSize: '12px', 
-                        color: '#64748b', 
-                        margin: 0 
-                      }}>
-                        {entry.totalPoints} pontos totais
-                      </p>
-                    </div>
+                        <span style={{
+                          color: index < 3 ? '#92400e' : '#64748b',
+                          fontWeight: '600',
+                          fontSize: '12px'
+                        }}>
+                          {index + 1}
+                        </span>
+                      </div>
 
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        backgroundColor: '#dcfce7',
-                        color: '#166534'
-                      }}>
-                        +{entry.monthlyPoints} mês
-                      </span>
+                      <div style={{ flex: 1 }}>
+                        <p style={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: memberStyle.textColor, // ✅ Ora usa il colore appropriato per il tema
+                          margin: 0,
+                          marginBottom: '2px',
+                          transition: 'color 0.3s ease'
+                        }}>
+                          {entry.member.firstName} {entry.member.lastName}
+                        </p>
+                        <p style={{
+                          fontSize: '12px',
+                          color: memberStyle.subtextColor, // ✅ Ora usa il colore appropriato per il tema
+                          margin: 0,
+                          transition: 'color 0.3s ease'
+                        }}>
+                          {entry.totalPoints} pontos totais
+                        </p>
+                      </div>
+
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          backgroundColor: '#dcfce7',
+                          color: '#166534'
+                        }}>
+                          +{entry.monthlyPoints} mês
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
@@ -256,7 +302,7 @@ export default function MembrosConrolePontuacaoPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
                   {/* Punti Totali */}
                   <div style={{
-                    background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                    background: colors.brand.gradient,
                     borderRadius: '12px',
                     padding: '20px',
                     color: 'white',
@@ -314,24 +360,21 @@ export default function MembrosConrolePontuacaoPage() {
 
                 {/* Transações recenti */}
                 <div style={{
-                  backgroundColor: 'white',
-                  borderRadius: '12px',
-                  padding: '20px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  border: '1px solid #f1f5f9'
+                  ...getCardStyle()
                 }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '12px', 
-                    marginBottom: '20px' 
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginBottom: '20px'
                   }}>
                     <Target style={{ width: '20px', height: '20px', color: '#8b5cf6' }} />
-                    <h3 style={{ 
-                      fontSize: '18px', 
-                      fontWeight: '600', 
-                      color: '#1e293b', 
-                      margin: 0 
+                    <h3 style={{
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      color: colors.text.primary,
+                      margin: 0,
+                      transition: 'color 0.3s ease'
                     }}>
                       Histórico de Pontos - {selectedMemberData.member.firstName} {selectedMemberData.member.lastName}
                     </h3>
@@ -340,15 +383,16 @@ export default function MembrosConrolePontuacaoPage() {
                   {selectedMemberData.transactions && selectedMemberData.transactions.length > 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {selectedMemberData.transactions.map((transaction) => (
-                        <div 
+                        <div
                           key={transaction.id}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
                             padding: '14px',
                             borderRadius: '8px',
-                            backgroundColor: '#f8fafc',
-                            border: '1px solid #f1f5f9'
+                            backgroundColor: colors.bg.tertiary,
+                            border: `1px solid ${colors.border.primary}`,
+                            transition: 'all 0.3s ease'
                           }}
                         >
                           <div style={{
@@ -366,11 +410,12 @@ export default function MembrosConrolePontuacaoPage() {
 
                           <div style={{ flex: 1 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                              <p style={{ 
-                                fontSize: '14px', 
-                                fontWeight: '500', 
-                                color: '#1e293b', 
-                                margin: 0
+                              <p style={{
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: colors.text.primary,
+                                margin: 0,
+                                transition: 'color 0.3s ease'
                               }}>
                                 {transaction.description || transaction.category}
                               </p>
@@ -379,25 +424,27 @@ export default function MembrosConrolePontuacaoPage() {
                                 borderRadius: '4px',
                                 fontSize: '10px',
                                 fontWeight: '500',
-                                backgroundColor: '#e2e8f0',
-                                color: '#475569',
-                                textTransform: 'uppercase'
+                                backgroundColor: colors.bg.hover,
+                                color: colors.text.secondary,
+                                textTransform: 'uppercase',
+                                transition: 'all 0.3s ease'
                               }}>
                                 {transaction.category}
                               </span>
                             </div>
-                            <p style={{ 
-                              fontSize: '12px', 
-                              color: '#64748b', 
-                              margin: 0 
+                            <p style={{
+                              fontSize: '12px',
+                              color: colors.text.secondary,
+                              margin: 0,
+                              transition: 'color 0.3s ease'
                             }}>
                               {new Date(transaction.createdAt).toLocaleDateString('pt-BR')} às {new Date(transaction.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
 
-                          <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
                             gap: '4px',
                             fontSize: '16px',
                             fontWeight: 'bold',
@@ -414,7 +461,7 @@ export default function MembrosConrolePontuacaoPage() {
                       ))}
                     </div>
                   ) : (
-                    <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>
+                    <div style={{ padding: '40px', textAlign: 'center', color: colors.text.secondary }}>
                       Nenhuma transação de pontos encontrada
                     </div>
                   )}
@@ -422,15 +469,12 @@ export default function MembrosConrolePontuacaoPage() {
               </>
             ) : (
               <div style={{
-                backgroundColor: 'white',
-                borderRadius: '12px',
+                ...getCardStyle(),
                 padding: '60px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                border: '1px solid #f1f5f9',
                 textAlign: 'center'
               }}>
-                <Trophy style={{ width: '48px', height: '48px', color: '#d1d5db', margin: '0 auto 16px' }} />
-                <h3 style={{ color: '#64748b', fontSize: '16px', margin: 0 }}>
+                <Trophy style={{ width: '48px', height: '48px', color: colors.text.tertiary, margin: '0 auto 16px' }} />
+                <h3 style={{ color: colors.text.secondary, fontSize: '16px', margin: 0 }}>
                   Selecione um membro no ranking para ver os detalhes de pontuação
                 </h3>
               </div>

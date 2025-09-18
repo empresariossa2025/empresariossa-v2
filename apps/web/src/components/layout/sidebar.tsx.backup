@@ -61,7 +61,6 @@ const navigation = [
       { name: "Convidados", href: "/membros/convidados" },
       { name: "Pagamentos", href: "/membros/pagamentos" },
       { name: "Controle Pontuação", href: "/membros/pontuacao" },
-      { name: "Gestão Pontuações", href: "/membros/gestao-pontuacao" },
       { name: "Regras de Pontuação", href: "/membros/regras" },
       { name: "Leads", href: "/membros/leads" }
     ]
