@@ -68,7 +68,7 @@ const navigation = [
   },
   {
     name: "Eventos",
-    href: "/events",
+    href: "/eventos",
     icon: Calendar1,
     color: "#ef4444"
   },

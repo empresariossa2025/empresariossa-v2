@@ -1,10 +1,12 @@
 "use client"
-import { Bell, RotateCcw, ChevronDown, Sun, Moon } from "lucide-react"
+import { Bell, RotateCcw, ChevronDown, Sun, Moon, LogOut } from "lucide-react"
 import { useTheme } from "@/contexts/theme-context"
+import { useAuth } from "@/contexts/auth-context"
 import { useThemedStyles } from "@/hooks/use-themed-styles"
 
 export function Header() {
   const { theme, toggleTheme } = useTheme()
+  const { user, logout } = useAuth()
   const { colors } = useThemedStyles()
 
   return (
@@ -16,142 +18,100 @@ export function Header() {
       height: '72px',
       display: 'flex',
       alignItems: 'center',
+      justifyContent: 'space-between',
       transition: 'all 0.3s ease'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-        <div style={{ marginLeft: '8px' }}>
-          <h1 style={{
-            fontSize: '24px',
-            fontWeight: 'bold',
-            color: colors.text.primary,
-            margin: 0,
-            marginBottom: '2px',
-            transition: 'color 0.3s ease'
-          }}>
-            Dashboard Admin
-          </h1>
-          <p style={{
-            fontSize: '14px',
-            color: colors.text.secondary,
-            margin: 0,
-            transition: 'color 0.3s ease'
-          }}>
-            Bem-vindo de volta! Aqui está o resumo do seu negócio.
-          </p>
+      {/* Logo */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{
+          background: colors.brand.gradient,
+          color: 'white',
+          padding: '8px 16px',
+          borderRadius: '8px',
+          fontWeight: 'bold'
+        }}>
+          Empresariossa
         </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            style={{
-              backgroundColor: colors.bg.tertiary,
-              border: `1px solid ${colors.border.primary}`,
-              color: colors.text.secondary,
-              padding: '8px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.3s ease',
-              width: '40px',
-              height: '40px'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.bg.hover
-              e.currentTarget.style.color = colors.text.primary
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = colors.bg.tertiary
-              e.currentTarget.style.color = colors.text.secondary
-            }}
-            title={theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
-          >
-            {theme === 'light' ? (
-              <Moon style={{ width: '18px', height: '18px' }} />
-            ) : (
-              <Sun style={{ width: '18px', height: '18px' }} />
-            )}
-          </button>
+      </div>
 
-          {/* Backup Button */}
-          <button style={{
-            backgroundColor: '#faf5ff',
-            border: '1px solid #e9d5ff',
-            color: '#7c3aed',
-            padding: '8px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.3s ease'
-          }}>
-            <RotateCcw style={{ width: '16px', height: '16px' }} />
-            Backup Dados
-          </button>
-
-          {/* Notifications */}
-          <button style={{
-            backgroundColor: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            position: 'relative',
+      {/* Right side controls */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          style={{
+            backgroundColor: colors.bg.tertiary,
+            border: `1px solid ${colors.border.primary}`,
+            color: colors.text.secondary,
             padding: '8px',
             borderRadius: '8px',
-            transition: 'background-color 0.3s ease'
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            width: '40px',
+            height: '40px'
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = colors.bg.tertiary
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent'
-          }}>
-            <Bell style={{ width: '20px', height: '20px', color: colors.text.secondary }} />
-            <span style={{
-              position: 'absolute',
-              top: '4px',
-              right: '4px',
-              width: '8px',
-              height: '8px',
-              backgroundColor: '#ef4444',
-              borderRadius: '50%'
-            }} />
-          </button>
+          title={theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
+        >
+          {theme === 'light' ? (
+            <Moon style={{ width: '18px', height: '18px' }} />
+          ) : (
+            <Sun style={{ width: '18px', height: '18px' }} />
+          )}
+        </button>
 
-          {/* User Menu */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* User info & logout */}
+        {user && (
+          <>
             <div style={{
-              width: '32px',
-              height: '32px',
-              backgroundColor: '#dcfce7',
-              borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              gap: '8px',
+              color: colors.text.primary,
+              fontSize: '14px'
             }}>
-              <span style={{ color: '#16a34a', fontWeight: '600', fontSize: '14px' }}>AS</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ 
-                fontSize: '14px', 
-                fontWeight: '500', 
-                color: colors.text.primary,
-                transition: 'color 0.3s ease'
+              <div style={{
+                backgroundColor: colors.brand.primary,
+                color: 'white',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 'bold'
               }}>
-                Admin Sistema
-              </span>
-              <ChevronDown style={{ 
-                width: '16px', 
-                height: '16px', 
+                {user.firstName[0]}{user.lastName[0]}
+              </div>
+              <span>{user.firstName} {user.lastName}</span>
+              <span style={{ 
+                fontSize: '12px', 
                 color: colors.text.secondary,
-                transition: 'color 0.3s ease'
-              }} />
+                textTransform: 'uppercase'
+              }}>
+                ({user.role})
+              </span>
             </div>
-          </div>
-        </div>
+            
+            <button
+              onClick={logout}
+              style={{
+                backgroundColor: colors.bg.tertiary,
+                border: `1px solid ${colors.border.primary}`,
+                color: colors.text.secondary,
+                padding: '8px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                width: '40px',
+                height: '40px'
+              }}
+              title="Logout"
+            >
+              <LogOut style={{ width: '18px', height: '18px' }} />
+            </button>
+          </>
+        )}
       </div>
     </header>
   )

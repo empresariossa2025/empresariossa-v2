@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { DatabaseModule } from './core/database/database.module'
+import { AuthModule } from './core/auth/auth.module'
 import { UsersModule } from './modules/users/users.module'
 import { OrganizationsModule } from './modules/organizations/organizations.module'
 import { EventsModule } from './modules/events/events.module'
@@ -12,6 +13,7 @@ import { PointsModule } from './modules/points/points.module'
       isGlobal: true,
     }),
     DatabaseModule,
+    AuthModule,
     UsersModule,
     OrganizationsModule,
     EventsModule,

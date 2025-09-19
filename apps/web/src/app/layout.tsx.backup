@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import { ThemeProvider } from "@/contexts/theme-context"
-import { AuthProvider } from "@/contexts/auth-context"
 
 export const metadata: Metadata = {
   title: "Empresariossa v2.0",
@@ -17,9 +16,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <ThemeProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>

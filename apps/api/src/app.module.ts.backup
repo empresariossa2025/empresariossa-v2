@@ -1,27 +1,21 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { ScheduleModule } from '@nestjs/schedule';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { DatabaseModule } from './core/database/database.module';
-import appConfig from './core/config/app.config';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { DatabaseModule } from './core/database/database.module'
+import { UsersModule } from './modules/users/users.module'
+import { OrganizationsModule } from './modules/organizations/organizations.module'
+import { EventsModule } from './modules/events/events.module'
+import { PointsModule } from './modules/points/points.module'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig],
-      envFilePath: '.env',
     }),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
-    ScheduleModule.forRoot(),
-    EventEmitterModule.forRoot(),
     DatabaseModule,
+    UsersModule,
+    OrganizationsModule,
+    EventsModule,
+    PointsModule
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
