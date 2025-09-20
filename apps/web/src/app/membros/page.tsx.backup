@@ -1,0 +1,40 @@
+'use client';
+import { useAuth } from '@/contexts/auth-context';
+import { useThemedStyles } from '@/hooks/use-themed-styles';
+
+export default function MembrosPage() {
+  const { user } = useAuth();
+  const { colors, getCardStyle } = useThemedStyles();
+
+  return (
+    <div style={{ padding: '32px' }}>
+      <h1 style={{ fontSize: '28px', color: colors.text.primary, marginBottom: '24px' }}>
+        Dashboard Membros - TEST SEMPLIFICATO
+      </h1>
+      
+      <div style={{
+        background: 'linear-gradient(135deg, #10b981, #059669)',
+        color: 'white',
+        padding: '40px',
+        borderRadius: '12px',
+        textAlign: 'center',
+        marginBottom: '32px'
+      }}>
+        <h2 style={{ fontSize: '48px', margin: '0 0 16px 0' }}>1,250</h2>
+        <p style={{ fontSize: '18px', margin: 0 }}>
+          Pontos • Ranking #8 de 120 membros
+        </p>
+        <p style={{ fontSize: '16px', margin: '8px 0 0 0', opacity: 0.9 }}>
+          Olá, {user?.firstName} {user?.lastName}!
+        </p>
+      </div>
+
+      <div style={{ color: colors.text.secondary }}>
+        ✅ Page rendering correttamente<br/>
+        ✅ Auth context funziona<br/>
+        ✅ Themed styles funziona<br/>
+        ✅ Pronto per aggiungere layout
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,27 @@
+'use client';
+import { useAuth } from '@/contexts/auth-context';
+import { MemberLayout } from '@/components/layout/member-layout';
+
+export default function MemberLayoutPage({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Carregando...
+      </div>
+    );
+  }
+
+  return <MemberLayout>{children}</MemberLayout>;
+}

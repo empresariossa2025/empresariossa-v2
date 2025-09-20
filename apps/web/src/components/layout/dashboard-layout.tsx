@@ -1,6 +1,5 @@
 "use client"
-
-import { Header } from "./header"
+import { SimpleEnhancedHeader } from "./simple-enhanced-header"
 import { Sidebar } from "./sidebar"
 import { useThemedStyles } from "@/hooks/use-themed-styles"
 
@@ -10,20 +9,20 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { colors } = useThemedStyles()
-
+  
   return (
-    <div style={{ 
-      display: 'flex', 
-      height: '100vh', 
+    <div style={{
+      display: 'flex',
+      height: '100vh',
       backgroundColor: colors.bg.secondary,
       transition: 'background-color 0.3s ease'
     }}>
       <Sidebar />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Header />
-        <main style={{ 
-          flex: 1, 
-          padding: '24px', 
+        <SimpleEnhancedHeader area="admin" />
+        <main style={{
+          flex: 1,
+          padding: '24px',
           overflowY: 'auto',
           backgroundColor: colors.bg.secondary,
           transition: 'background-color 0.3s ease'

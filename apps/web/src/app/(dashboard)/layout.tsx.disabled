@@ -1,0 +1,41 @@
+'use client';
+import { useAuth, hasRouteAccess } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { DashboardLayout } from '@/components/layout/dashboard-layout';
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && (!user || !hasRouteAccess(user.role, '/admin'))) {
+      router.push('/login');
+      return;
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Carregando...
+      </div>
+    );
+  }
+
+  if (!user || !hasRouteAccess(user.role, '/admin')) {
+    return null;
+  }
+
+  return <DashboardLayout>{children}</DashboardLayout>;
+}

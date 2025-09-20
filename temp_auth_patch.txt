@@ -1,0 +1,12 @@
+// Dopo la riga setUser(userData); aggiungi:
+      // Role-based redirect after successful login
+      const roleRoutes = {
+        'SUPER_ADMIN': '/admin',
+        'ADMIN': '/admin', 
+        'ADMINISTRATIVO': '/admin',
+        'MEMBRO': '/member',
+        'GUEST': '/demo',
+        'VISITANTE': '/demo'
+      };
+      const defaultRoute = roleRoutes[userData.role] || '/admin';
+      router.push(defaultRoute);
