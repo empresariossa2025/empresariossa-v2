@@ -20,31 +20,20 @@ model User {
   emailVerified Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
-  // Laravel fields essenziali
-  type          String   @default("member")
-  cellPhone     String?
-  companieName  String?
-  companieCnpj  String?
-  description   String?
-  branchId      String?
-  unitId        String?
-  
-  // Relations
-  businesses    Business[]
-  organizations OrganizationMember[]
-  contracts     Contract[]
-  charges       Charge[]
-  events        EventAttendee[]
-  classes       ClassEnrollment[]
-  comments      ClassComment[]
-  documents     Document[]
-  memberPoints  MemberPoints?
+
+  organizations     OrganizationMember[]
+  contracts         Contract[]
+  charges           Charge[]
+  events            EventAttendee[]
+  classes           ClassEnrollment[]
+  comments          ClassComment[]
+  documents         Document[]
+  memberPoints      MemberPoints?
   pointTransactions PointTransaction[]
-  memberMetrics MemberMetrics?
-  meetings      Meeting[]
-  memberVisits  MemberVisit[]
-  recommendations Recommendation[]
+  memberMetrics     MemberMetrics?
+  meetings          Meeting[]
+  memberVisits      MemberVisit[]
+  recommendations   Recommendation[]
 }
 
 model Organization {
@@ -346,36 +335,4 @@ model MemberMetrics {
   member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   @@map("member_metrics")
-}
-
-model Business {
-  id              String   @id @default(uuid())
-  memberId        String
-  operation       Int      // 0=compra, 1=vendita
-  type            Int      
-  name            String?
-  cnpjCpf         String?
-  cellPhone       String?
-  email           String?
-  description     String
-  amount          Decimal
-  pointsChecked   Boolean  @default(false)
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  member          User     @relation(fields: [memberId], references: [id])
-  
-  @@map("businesses")
-}
-
-model Level {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@map("levels")
 }

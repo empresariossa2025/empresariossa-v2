@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { LaravelModule } from './modules/laravel/laravel.module';
 import { ConfigModule } from '@nestjs/config'
 import { DatabaseModule } from './core/database/database.module'
 import { AuthModule } from './core/auth/auth.module'
@@ -17,7 +18,8 @@ import { PointsModule } from './modules/points/points.module'
     UsersModule,
     OrganizationsModule,
     EventsModule,
-    PointsModule
+    PointsModule,
+    LaravelModule,
   ],
 })
 export class AppModule {}

@@ -9,7 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
+  async create(createUserDto: CreateUserDto): Promise<any> {
     const { password, ...userData } = createUserDto;
 
     // Verifica se já existe usuário com email, cpf ou cnpj
@@ -54,7 +54,7 @@ export class UsersService {
     take?: number;
     where?: Prisma.UserWhereInput;
     orderBy?: Prisma.UserOrderByWithRelationInput;
-  } = {}): Promise<{ users: Omit<User, 'password'>[]; total: number }> {
+  } = {}): Promise<{ users: any[]; total: number }> {
     const { skip = 0, take = 10, where, orderBy } = params;
 
     const [users, total] = await Promise.all([
@@ -83,7 +83,7 @@ export class UsersService {
     return { users, total };
   }
 
-  async findOne(id: string): Promise<Omit<User, 'password'>> {
+  async findOne(id: string): Promise<any> {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -108,7 +108,7 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<Omit<User, 'password'>> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
     const existingUser = await this.prisma.user.findUnique({
       where: { id }
     });
