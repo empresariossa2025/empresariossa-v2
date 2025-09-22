@@ -27,6 +27,7 @@ model User {
   description       String?
   type              String               @default("member")
   unitId            String?
+  unit        Unit?    @relation(fields: [unitId], references: [id])
 
   // === LARAVEL FIELDS EXTENSION ===
   laravelId               BigInt?   @unique
@@ -153,6 +154,8 @@ model Event {
   capacity    Int?
   createdAt   DateTime        @default(now())
   metadata    Json?
+  unitsId     String?
+  unit        Unit?    @relation(fields: [unitsId], references: [id])
   attendees   EventAttendee[]
 }
 
@@ -324,6 +327,39 @@ model Business {
   member        User     @relation(fields: [memberId], references: [id])
 
   @@map("businesses")
+}
+
+model Unit {
+  id                    String   @id @default(uuid())
+  laravelId             BigInt?  @unique
+  type                  BigInt
+  name                  String
+  responsibleName       String
+  responsibleCpf        String?
+  responsibleEmail      String
+  responsibleCellPhone  String
+  companieLegalName     String
+  companieCnpj          String
+  companieTaxation      BigInt
+  companieShareCapital  String
+  companieName          String
+  companieCpf           String?
+  address               String?
+  number                String?
+  complement            String?
+  district              String?
+  zipCode               String?
+  countriesId           BigInt
+  statesId              BigInt
+  citiesId              BigInt
+  isActive              Boolean  @default(false)
+  usersAt               String?
+  usersDeletedAt        String?
+  deletedAt             DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  events                Event[]
+  users                 User[]
 }
 
 model Level {
