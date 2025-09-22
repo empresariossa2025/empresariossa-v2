@@ -8,81 +8,88 @@ datasource db {
 }
 
 model User {
-  id                String               @id @default(uuid())
-  email             String               @unique
-  password          String
-  firstName         String
-  lastName          String
-  cpf               String?              @unique
-  cnpj              String?              @unique
-  role              UserRole             @default(USER)
-  isActive          Boolean              @default(true)
-  emailVerified     Boolean              @default(false)
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
-  branchId          String?
-  cellPhone         String?
-  companieCnpj      String?
-  companieName      String?
-  description       String?
-  type              String               @default("member")
-  unitId            String?
-  charges           Charge[]
-  comments          ClassComment[]
-  classes           ClassEnrollment[]
-  contracts         Contract[]
-  documents         Document[]
-  events            EventAttendee[]
-  organizations     OrganizationMember[]
-  businesses        Business[]
-  meetings          Meeting[]
-  memberMetrics     MemberMetrics?
-  memberPoints      MemberPoints?
-  memberVisits      MemberVisit[]
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  firstName     String
+  lastName      String
+  cpf           String?  @unique
+  cnpj          String?  @unique
+  role          UserRole @default(USER)
+  isActive      Boolean  @default(true)
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Laravel fields essenziali
+  type          String   @default("member")
+  cellPhone     String?
+  companieName  String?
+  companieCnpj  String?
+  description   String?
+  branchId      String?
+  unitId        String?
+  
+  // Relations
+  businesses    Business[]
+  organizations OrganizationMember[]
+  contracts     Contract[]
+  charges       Charge[]
+  events        EventAttendee[]
+  classes       ClassEnrollment[]
+  comments      ClassComment[]
+  documents     Document[]
+  memberPoints  MemberPoints?
   pointTransactions PointTransaction[]
-  recommendations   Recommendation[]
+  memberMetrics MemberMetrics?
+  meetings      Meeting[]
+  memberVisits  MemberVisit[]
+  recommendations Recommendation[]
 }
 
 model Organization {
-  id        String               @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  cnpj      String               @unique
+  cnpj      String   @unique
   email     String
   phone     String
   address   String
   city      String
   state     String
   zipCode   String
-  isActive  Boolean              @default(true)
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-  branches  Branch[]
-  contracts Contract[]
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   members   OrganizationMember[]
+  contracts Contract[]
+  branches  Branch[]
 }
 
 model OrganizationMember {
-  id             String       @id @default(uuid())
+  id             String     @id @default(uuid())
   userId         String
   organizationId String
-  role           MemberRole   @default(MEMBER)
-  joinedAt       DateTime     @default(now())
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  user           User         @relation(fields: [userId], references: [id])
+  role           MemberRole @default(MEMBER)
+  joinedAt       DateTime   @default(now())
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
 
   @@unique([userId, organizationId])
 }
 
 model Branch {
-  id             String       @id @default(uuid())
+  id             String   @id @default(uuid())
   organizationId String
   name           String
   address        String
   city           String
   state          String
   zipCode        String
-  createdAt      DateTime     @default(now())
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Contract {
@@ -96,9 +103,10 @@ model Contract {
   value          Decimal        @db.Decimal(10, 2)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
-  charges        Charge[]
-  organization   Organization   @relation(fields: [organizationId], references: [id])
-  user           User           @relation(fields: [userId], references: [id])
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+  charges      Charge[]
 }
 
 model Charge {
@@ -110,21 +118,23 @@ model Charge {
   paidAt     DateTime?
   status     ChargeStatus @default(PENDING)
   createdAt  DateTime     @default(now())
-  contract   Contract     @relation(fields: [contractId], references: [id])
-  user       User         @relation(fields: [userId], references: [id])
+
+  contract Contract @relation(fields: [contractId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
 }
 
 model Event {
-  id          String          @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   description String?
+  metadata    Json?
   startDate   DateTime
   endDate     DateTime
   location    String?
   capacity    Int?
-  createdAt   DateTime        @default(now())
-  metadata    Json?
-  attendees   EventAttendee[]
+  createdAt   DateTime @default(now())
+
+  attendees EventAttendee[]
 }
 
 model EventAttendee {
@@ -133,23 +143,25 @@ model EventAttendee {
   userId    String
   status    AttendeeStatus @default(REGISTERED)
   createdAt DateTime       @default(now())
-  event     Event          @relation(fields: [eventId], references: [id])
-  user      User           @relation(fields: [userId], references: [id])
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
 
   @@unique([eventId, userId])
 }
 
 model Class {
-  id          String            @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   description String?
+  metadata    Json?
   content     String?
   videoUrl    String?
   duration    Int?
-  createdAt   DateTime          @default(now())
-  metadata    Json?
-  comments    ClassComment[]
+  createdAt   DateTime @default(now())
+
   enrollments ClassEnrollment[]
+  comments    ClassComment[]
 }
 
 model ClassEnrollment {
@@ -159,8 +171,9 @@ model ClassEnrollment {
   progress    Int       @default(0)
   completedAt DateTime?
   createdAt   DateTime  @default(now())
-  class       Class     @relation(fields: [classId], references: [id])
-  user        User      @relation(fields: [userId], references: [id])
+
+  class Class @relation(fields: [classId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
 
   @@unique([classId, userId])
 }
@@ -171,8 +184,9 @@ model ClassComment {
   userId    String
   content   String
   createdAt DateTime @default(now())
-  class     Class    @relation(fields: [classId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+
+  class Class @relation(fields: [classId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
 }
 
 model Document {
@@ -183,129 +197,8 @@ model Document {
   mimeType  String
   size      Int
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-}
 
-model MemberPoints {
-  id            String   @id @default(uuid())
-  memberId      String   @unique
-  totalPoints   Int      @default(0)
-  monthlyPoints Int      @default(0)
-  yearlyPoints  Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  member        User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
-
-  @@map("member_points")
-}
-
-model PointTransaction {
-  id          String               @id @default(uuid())
-  memberId    String
-  points      Int
-  category    PointCategory
-  type        PointTransactionType
-  description String?
-  metadata    Json?
-  createdAt   DateTime             @default(now())
-  member      User                 @relation(fields: [memberId], references: [id], onDelete: Cascade)
-
-  @@map("point_transactions")
-}
-
-model Meeting {
-  id        String   @id @default(uuid())
-  memberId  String
-  date      DateTime
-  type      String?
-  notes     String?
-  createdAt DateTime @default(now())
-  member    User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
-
-  @@map("meetings")
-}
-
-model MemberVisit {
-  id          String   @id @default(uuid())
-  memberId    String
-  visitorName String
-  visitDate   DateTime
-  notes       String?
-  createdAt   DateTime @default(now())
-  member      User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
-
-  @@map("member_visits")
-}
-
-model Recommendation {
-  id               String    @id @default(uuid())
-  memberId         String
-  recommendedName  String
-  recommendedEmail String?
-  status           String    @default("PENDING")
-  closedAt         DateTime?
-  createdAt        DateTime  @default(now())
-  member           User      @relation(fields: [memberId], references: [id], onDelete: Cascade)
-
-  @@map("recommendations")
-}
-
-model PointRule {
-  id        String   @id @default(uuid())
-  name      String
-  minimal   String?
-  type      Int      @default(2)
-  items     Int      @default(1)
-  points    Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-
-  @@map("point_rules")
-}
-
-model MemberMetrics {
-  id                    String   @id @default(uuid())
-  memberId              String   @unique
-  eventsAttended        Int      @default(0)
-  meetingsHeld          Int      @default(0)
-  visitorsReferred      Int      @default(0)
-  recommendationsMade   Int      @default(0)
-  recommendationsClosed Int      @default(0)
-  lastUpdated           DateTime @default(now())
-  member                User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
-
-  @@map("member_metrics")
-}
-
-model Business {
-  id            String   @id @default(uuid())
-  memberId      String
-  operation     Int
-  type          Int
-  name          String?
-  cnpjCpf       String?
-  cellPhone     String?
-  email         String?
-  description   String
-  amount        Decimal
-  pointsChecked Boolean  @default(false)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  member        User     @relation(fields: [memberId], references: [id])
-
-  @@map("businesses")
-}
-
-model Level {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("levels")
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum UserRole {
@@ -355,4 +248,134 @@ enum PointTransactionType {
   EARNED
   PENALTY
   BONUS
+}
+
+model MemberPoints {
+  id            String   @id @default(uuid())
+  memberId      String
+  totalPoints   Int      @default(0)
+  monthlyPoints Int      @default(0)
+  yearlyPoints  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId])
+  @@map("member_points")
+}
+
+model PointTransaction {
+  id          String               @id @default(uuid())
+  memberId    String
+  points      Int
+  category    PointCategory
+  type        PointTransactionType
+  description String?
+  metadata    Json?
+  createdAt   DateTime             @default(now())
+
+  member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("point_transactions")
+}
+
+model Meeting {
+  id        String   @id @default(uuid())
+  memberId  String
+  date      DateTime
+  type      String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("meetings")
+}
+
+model MemberVisit {
+  id          String   @id @default(uuid())
+  memberId    String
+  visitorName String
+  visitDate   DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("member_visits")
+}
+
+model Recommendation {
+  id               String    @id @default(uuid())
+  memberId         String
+  recommendedName  String
+  recommendedEmail String?
+  status           String    @default("PENDING")
+  closedAt         DateTime?
+  createdAt        DateTime  @default(now())
+
+  member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("recommendations")
+}
+
+model PointRule {
+  id        String   @id @default(uuid())
+  name      String
+  minimal   String?
+  type      Int      @default(2)
+  items     Int      @default(1)
+  points    Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("point_rules")
+}
+
+model MemberMetrics {
+  id                    String   @id @default(uuid())
+  memberId              String   @unique
+  eventsAttended        Int      @default(0)
+  meetingsHeld          Int      @default(0)
+  visitorsReferred      Int      @default(0)
+  recommendationsMade   Int      @default(0)
+  recommendationsClosed Int      @default(0)
+  lastUpdated           DateTime @default(now())
+
+  member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("member_metrics")
+}
+
+model Business {
+  id              String   @id @default(uuid())
+  memberId        String
+  operation       Int      // 0=compra, 1=vendita
+  type            Int      
+  name            String?
+  cnpjCpf         String?
+  cellPhone       String?
+  email           String?
+  description     String
+  amount          Decimal
+  pointsChecked   Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  member          User     @relation(fields: [memberId], references: [id])
+  
+  @@map("businesses")
+}
+
+model Level {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("levels")
 }
