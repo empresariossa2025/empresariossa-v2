@@ -20,17 +20,6 @@ model User {
   emailVerified     Boolean              @default(false)
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
-
-  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
-  laravelId     BigInt?   @unique  // Laravel users.id mapping
-  who           String?             // Laravel users.who
-  nickname      String?             // Laravel users.nickname
-  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
-  userStatus    BigInt    @default(0) // Laravel users.status
-  birth         DateTime? @db.Date  // Laravel users.birth
-  avatar        String?             // Laravel users.avatar
-  logo          String?             // Laravel users.logo
-  movie         String?             // Laravel users.movie
   branchId          String?
   cellPhone         String?
   companieCnpj      String?
@@ -67,17 +56,6 @@ model Organization {
   isActive  Boolean              @default(true)
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
-
-  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
-  laravelId     BigInt?   @unique  // Laravel users.id mapping
-  who           String?             // Laravel users.who
-  nickname      String?             // Laravel users.nickname
-  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
-  userStatus    BigInt    @default(0) // Laravel users.status
-  birth         DateTime? @db.Date  // Laravel users.birth
-  avatar        String?             // Laravel users.avatar
-  logo          String?             // Laravel users.logo
-  movie         String?             // Laravel users.movie
   branches  Branch[]
   contracts Contract[]
   members   OrganizationMember[]
@@ -118,17 +96,6 @@ model Contract {
   value          Decimal        @db.Decimal(10, 2)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
-
-  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
-  laravelId     BigInt?   @unique  // Laravel users.id mapping
-  who           String?             // Laravel users.who
-  nickname      String?             // Laravel users.nickname
-  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
-  userStatus    BigInt    @default(0) // Laravel users.status
-  birth         DateTime? @db.Date  // Laravel users.birth
-  avatar        String?             // Laravel users.avatar
-  logo          String?             // Laravel users.logo
-  movie         String?             // Laravel users.movie
   charges        Charge[]
   organization   Organization   @relation(fields: [organizationId], references: [id])
   user           User           @relation(fields: [userId], references: [id])
@@ -227,17 +194,6 @@ model MemberPoints {
   yearlyPoints  Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
-  laravelId     BigInt?   @unique  // Laravel users.id mapping
-  who           String?             // Laravel users.who
-  nickname      String?             // Laravel users.nickname
-  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
-  userStatus    BigInt    @default(0) // Laravel users.status
-  birth         DateTime? @db.Date  // Laravel users.birth
-  avatar        String?             // Laravel users.avatar
-  logo          String?             // Laravel users.logo
-  movie         String?             // Laravel users.movie
   member        User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   @@map("member_points")
@@ -336,17 +292,6 @@ model Business {
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
-  laravelId     BigInt?   @unique  // Laravel users.id mapping
-  who           String?             // Laravel users.who
-  nickname      String?             // Laravel users.nickname
-  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
-  userStatus    BigInt    @default(0) // Laravel users.status
-  birth         DateTime? @db.Date  // Laravel users.birth
-  avatar        String?             // Laravel users.avatar
-  logo          String?             // Laravel users.logo
-  movie         String?             // Laravel users.movie
   member        User     @relation(fields: [memberId], references: [id])
 
   @@map("businesses")
@@ -359,17 +304,6 @@ model Level {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
-  laravelId     BigInt?   @unique  // Laravel users.id mapping
-  who           String?             // Laravel users.who
-  nickname      String?             // Laravel users.nickname
-  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
-  userStatus    BigInt    @default(0) // Laravel users.status
-  birth         DateTime? @db.Date  // Laravel users.birth
-  avatar        String?             // Laravel users.avatar
-  logo          String?             // Laravel users.logo
-  movie         String?             // Laravel users.movie
 
   @@map("levels")
 }
