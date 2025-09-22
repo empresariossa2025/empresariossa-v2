@@ -1,0 +1,556 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String               @id @default(uuid())
+  email             String               @unique
+  password          String
+  firstName         String
+  lastName          String
+  cpf               String?              @unique
+  cnpj              String?              @unique
+  role              UserRole             @default(USER)
+  isActive          Boolean              @default(true)
+  emailVerified     Boolean              @default(false)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
+  laravelId     BigInt?   @unique  // Laravel users.id mapping
+  who           String?             // Laravel users.who
+  nickname      String?             // Laravel users.nickname
+  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
+  userStatus    BigInt    @default(0) // Laravel users.status
+  birth         DateTime? @db.Date  // Laravel users.birth
+  avatar        String?             // Laravel users.avatar
+  logo          String?             // Laravel users.logo
+  movie         String?             // Laravel users.movie
+
+  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
+  funcCompanie            String?             // Laravel users.func_companie
+  companieDescription     String?             // Laravel users.companie_description
+  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
+  amountEmployees         BigInt?             // Laravel users.amount_employees
+  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
+  groupExpectation        String?             // Laravel users.group_expectation
+  specificActivity        String?             // Laravel users.specific_activity
+  timeAtuation            String?             // Laravel users.time_atuation
+  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
+  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
+
+  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
+  website       String?             // Laravel users.website
+  linkedIn      String?             // Laravel users.linkedIn
+  twitter       String?             // Laravel users.twitter
+  instagram     String?             // Laravel users.instagram
+  facebook      String?             // Laravel users.facebook
+  kwai          String?             // Laravel users.kwai
+  youtube       String?             // Laravel users.youtube
+  tiktok        String?             // Laravel users.tiktok
+  branchId          String?
+  cellPhone         String?
+  companieCnpj      String?
+  companieName      String?
+  description       String?
+  type              String               @default("member")
+  unitId            String?
+  charges           Charge[]
+  comments          ClassComment[]
+  classes           ClassEnrollment[]
+  contracts         Contract[]
+  documents         Document[]
+  events            EventAttendee[]
+  organizations     OrganizationMember[]
+  businesses        Business[]
+  meetings          Meeting[]
+  memberMetrics     MemberMetrics?
+  memberPoints      MemberPoints?
+  memberVisits      MemberVisit[]
+  pointTransactions PointTransaction[]
+  recommendations   Recommendation[]
+}
+
+model Organization {
+  id        String               @id @default(uuid())
+  name      String
+  cnpj      String               @unique
+  email     String
+  phone     String
+  address   String
+  city      String
+  state     String
+  zipCode   String
+  isActive  Boolean              @default(true)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
+  laravelId     BigInt?   @unique  // Laravel users.id mapping
+  who           String?             // Laravel users.who
+  nickname      String?             // Laravel users.nickname
+  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
+  userStatus    BigInt    @default(0) // Laravel users.status
+  birth         DateTime? @db.Date  // Laravel users.birth
+  avatar        String?             // Laravel users.avatar
+  logo          String?             // Laravel users.logo
+  movie         String?             // Laravel users.movie
+
+  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
+  funcCompanie            String?             // Laravel users.func_companie
+  companieDescription     String?             // Laravel users.companie_description
+  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
+  amountEmployees         BigInt?             // Laravel users.amount_employees
+  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
+  groupExpectation        String?             // Laravel users.group_expectation
+  specificActivity        String?             // Laravel users.specific_activity
+  timeAtuation            String?             // Laravel users.time_atuation
+  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
+  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
+
+  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
+  website       String?             // Laravel users.website
+  linkedIn      String?             // Laravel users.linkedIn
+  twitter       String?             // Laravel users.twitter
+  instagram     String?             // Laravel users.instagram
+  facebook      String?             // Laravel users.facebook
+  kwai          String?             // Laravel users.kwai
+  youtube       String?             // Laravel users.youtube
+  tiktok        String?             // Laravel users.tiktok
+  branches  Branch[]
+  contracts Contract[]
+  members   OrganizationMember[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid())
+  userId         String
+  organizationId String
+  role           MemberRole   @default(MEMBER)
+  joinedAt       DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([userId, organizationId])
+}
+
+model Branch {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  address        String
+  city           String
+  state          String
+  zipCode        String
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+}
+
+model Contract {
+  id             String         @id @default(uuid())
+  organizationId String
+  userId         String
+  number         String         @unique
+  status         ContractStatus @default(DRAFT)
+  startDate      DateTime
+  endDate        DateTime?
+  value          Decimal        @db.Decimal(10, 2)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
+  laravelId     BigInt?   @unique  // Laravel users.id mapping
+  who           String?             // Laravel users.who
+  nickname      String?             // Laravel users.nickname
+  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
+  userStatus    BigInt    @default(0) // Laravel users.status
+  birth         DateTime? @db.Date  // Laravel users.birth
+  avatar        String?             // Laravel users.avatar
+  logo          String?             // Laravel users.logo
+  movie         String?             // Laravel users.movie
+
+  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
+  funcCompanie            String?             // Laravel users.func_companie
+  companieDescription     String?             // Laravel users.companie_description
+  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
+  amountEmployees         BigInt?             // Laravel users.amount_employees
+  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
+  groupExpectation        String?             // Laravel users.group_expectation
+  specificActivity        String?             // Laravel users.specific_activity
+  timeAtuation            String?             // Laravel users.time_atuation
+  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
+  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
+
+  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
+  website       String?             // Laravel users.website
+  linkedIn      String?             // Laravel users.linkedIn
+  twitter       String?             // Laravel users.twitter
+  instagram     String?             // Laravel users.instagram
+  facebook      String?             // Laravel users.facebook
+  kwai          String?             // Laravel users.kwai
+  youtube       String?             // Laravel users.youtube
+  tiktok        String?             // Laravel users.tiktok
+  charges        Charge[]
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+}
+
+model Charge {
+  id         String       @id @default(uuid())
+  contractId String
+  userId     String
+  amount     Decimal      @db.Decimal(10, 2)
+  dueDate    DateTime
+  paidAt     DateTime?
+  status     ChargeStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+  contract   Contract     @relation(fields: [contractId], references: [id])
+  user       User         @relation(fields: [userId], references: [id])
+}
+
+model Event {
+  id          String          @id @default(uuid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  location    String?
+  capacity    Int?
+  createdAt   DateTime        @default(now())
+  metadata    Json?
+  attendees   EventAttendee[]
+}
+
+model EventAttendee {
+  id        String         @id @default(uuid())
+  eventId   String
+  userId    String
+  status    AttendeeStatus @default(REGISTERED)
+  createdAt DateTime       @default(now())
+  event     Event          @relation(fields: [eventId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+model Class {
+  id          String            @id @default(uuid())
+  title       String
+  description String?
+  content     String?
+  videoUrl    String?
+  duration    Int?
+  createdAt   DateTime          @default(now())
+  metadata    Json?
+  comments    ClassComment[]
+  enrollments ClassEnrollment[]
+}
+
+model ClassEnrollment {
+  id          String    @id @default(uuid())
+  classId     String
+  userId      String
+  progress    Int       @default(0)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  class       Class     @relation(fields: [classId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([classId, userId])
+}
+
+model ClassComment {
+  id        String   @id @default(uuid())
+  classId   String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  class     Class    @relation(fields: [classId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  userId    String
+  fileName  String
+  fileKey   String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model MemberPoints {
+  id            String   @id @default(uuid())
+  memberId      String   @unique
+  totalPoints   Int      @default(0)
+  monthlyPoints Int      @default(0)
+  yearlyPoints  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
+  laravelId     BigInt?   @unique  // Laravel users.id mapping
+  who           String?             // Laravel users.who
+  nickname      String?             // Laravel users.nickname
+  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
+  userStatus    BigInt    @default(0) // Laravel users.status
+  birth         DateTime? @db.Date  // Laravel users.birth
+  avatar        String?             // Laravel users.avatar
+  logo          String?             // Laravel users.logo
+  movie         String?             // Laravel users.movie
+
+  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
+  funcCompanie            String?             // Laravel users.func_companie
+  companieDescription     String?             // Laravel users.companie_description
+  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
+  amountEmployees         BigInt?             // Laravel users.amount_employees
+  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
+  groupExpectation        String?             // Laravel users.group_expectation
+  specificActivity        String?             // Laravel users.specific_activity
+  timeAtuation            String?             // Laravel users.time_atuation
+  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
+  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
+
+  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
+  website       String?             // Laravel users.website
+  linkedIn      String?             // Laravel users.linkedIn
+  twitter       String?             // Laravel users.twitter
+  instagram     String?             // Laravel users.instagram
+  facebook      String?             // Laravel users.facebook
+  kwai          String?             // Laravel users.kwai
+  youtube       String?             // Laravel users.youtube
+  tiktok        String?             // Laravel users.tiktok
+  member        User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("member_points")
+}
+
+model PointTransaction {
+  id          String               @id @default(uuid())
+  memberId    String
+  points      Int
+  category    PointCategory
+  type        PointTransactionType
+  description String?
+  metadata    Json?
+  createdAt   DateTime             @default(now())
+  member      User                 @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("point_transactions")
+}
+
+model Meeting {
+  id        String   @id @default(uuid())
+  memberId  String
+  date      DateTime
+  type      String?
+  notes     String?
+  createdAt DateTime @default(now())
+  member    User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("meetings")
+}
+
+model MemberVisit {
+  id          String   @id @default(uuid())
+  memberId    String
+  visitorName String
+  visitDate   DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+  member      User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("member_visits")
+}
+
+model Recommendation {
+  id               String    @id @default(uuid())
+  memberId         String
+  recommendedName  String
+  recommendedEmail String?
+  status           String    @default("PENDING")
+  closedAt         DateTime?
+  createdAt        DateTime  @default(now())
+  member           User      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("recommendations")
+}
+
+model PointRule {
+  id        String   @id @default(uuid())
+  name      String
+  minimal   String?
+  type      Int      @default(2)
+  items     Int      @default(1)
+  points    Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("point_rules")
+}
+
+model MemberMetrics {
+  id                    String   @id @default(uuid())
+  memberId              String   @unique
+  eventsAttended        Int      @default(0)
+  meetingsHeld          Int      @default(0)
+  visitorsReferred      Int      @default(0)
+  recommendationsMade   Int      @default(0)
+  recommendationsClosed Int      @default(0)
+  lastUpdated           DateTime @default(now())
+  member                User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("member_metrics")
+}
+
+model Business {
+  id            String   @id @default(uuid())
+  memberId      String
+  operation     Int
+  type          Int
+  name          String?
+  cnpjCpf       String?
+  cellPhone     String?
+  email         String?
+  description   String
+  amount        Decimal
+  pointsChecked Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
+  laravelId     BigInt?   @unique  // Laravel users.id mapping
+  who           String?             // Laravel users.who
+  nickname      String?             // Laravel users.nickname
+  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
+  userStatus    BigInt    @default(0) // Laravel users.status
+  birth         DateTime? @db.Date  // Laravel users.birth
+  avatar        String?             // Laravel users.avatar
+  logo          String?             // Laravel users.logo
+  movie         String?             // Laravel users.movie
+
+  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
+  funcCompanie            String?             // Laravel users.func_companie
+  companieDescription     String?             // Laravel users.companie_description
+  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
+  amountEmployees         BigInt?             // Laravel users.amount_employees
+  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
+  groupExpectation        String?             // Laravel users.group_expectation
+  specificActivity        String?             // Laravel users.specific_activity
+  timeAtuation            String?             // Laravel users.time_atuation
+  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
+  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
+
+  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
+  website       String?             // Laravel users.website
+  linkedIn      String?             // Laravel users.linkedIn
+  twitter       String?             // Laravel users.twitter
+  instagram     String?             // Laravel users.instagram
+  facebook      String?             // Laravel users.facebook
+  kwai          String?             // Laravel users.kwai
+  youtube       String?             // Laravel users.youtube
+  tiktok        String?             // Laravel users.tiktok
+  member        User     @relation(fields: [memberId], references: [id])
+
+  @@map("businesses")
+}
+
+model Level {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // === FASE 2: LARAVEL PERSONAL INFO FIELDS (SAFE) ===
+  laravelId     BigInt?   @unique  // Laravel users.id mapping
+  who           String?             // Laravel users.who
+  nickname      String?             // Laravel users.nickname
+  userSlug      String?             // Laravel users.slug (renamed to avoid conflict)
+  userStatus    BigInt    @default(0) // Laravel users.status
+  birth         DateTime? @db.Date  // Laravel users.birth
+  avatar        String?             // Laravel users.avatar
+  logo          String?             // Laravel users.logo
+  movie         String?             // Laravel users.movie
+
+  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
+  funcCompanie            String?             // Laravel users.func_companie
+  companieDescription     String?             // Laravel users.companie_description
+  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
+  amountEmployees         BigInt?             // Laravel users.amount_employees
+  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
+  groupExpectation        String?             // Laravel users.group_expectation
+  specificActivity        String?             // Laravel users.specific_activity
+  timeAtuation            String?             // Laravel users.time_atuation
+  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
+  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
+
+  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
+  website       String?             // Laravel users.website
+  linkedIn      String?             // Laravel users.linkedIn
+  twitter       String?             // Laravel users.twitter
+  instagram     String?             // Laravel users.instagram
+  facebook      String?             // Laravel users.facebook
+  kwai          String?             // Laravel users.kwai
+  youtube       String?             // Laravel users.youtube
+  tiktok        String?             // Laravel users.tiktok
+
+  @@map("levels")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  COMPLETED
+}
+
+enum ChargeStatus {
+  PENDING
+  PROCESSING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+enum AttendeeStatus {
+  REGISTERED
+  CONFIRMED
+  ATTENDED
+  CANCELLED
+}
+
+enum PointCategory {
+  ATTENDANCE
+  MEETING
+  VISITOR
+  RECOMMENDATION
+  BUSINESS_DEAL
+}
+
+enum PointTransactionType {
+  EARNED
+  PENALTY
+  BONUS
+}

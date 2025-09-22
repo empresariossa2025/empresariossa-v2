@@ -27,35 +27,6 @@ model User {
   description       String?
   type              String               @default("member")
   unitId            String?
-
-  // === LARAVEL FIELDS EXTENSION ===
-  laravelId               BigInt?   @unique
-  who                     String?
-  nickname                String?
-  userSlug                String?
-  userStatus              BigInt    @default(0)
-  birth                   DateTime? @db.Date
-  avatar                  String?
-  logo                    String?
-  movie                   String?
-  funcCompanie            String?
-  companieDescription     String?
-  companieInvoicing       Decimal?  @db.Decimal(10,2)
-  amountEmployees         BigInt?
-  listPartnershipsClients String?
-  groupExpectation        String?
-  specificActivity        String?
-  timeAtuation            String?
-  allowsContact           Boolean   @default(true)
-  urgencySchedule         BigInt?
-  website                 String?
-  linkedIn                String?
-  twitter                 String?
-  instagram               String?
-  facebook                String?
-  kwai                    String?
-  youtube                 String?
-  tiktok                  String?
   charges           Charge[]
   comments          ClassComment[]
   classes           ClassEnrollment[]
