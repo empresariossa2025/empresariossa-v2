@@ -1,6 +1,5 @@
 "use client"
-
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -11,21 +10,25 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light')
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('dark')
 
   useEffect(() => {
-    // Load theme from localStorage on mount
-    const savedTheme = localStorage.getItem('empresariossa-theme') as Theme
-    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('empresariossa-theme') as Theme | null
+    if (savedTheme) {
       setTheme(savedTheme)
     }
   }, [])
 
+  useEffect(() => {
+    // Apply theme to body
+    document.body.setAttribute('data-theme', theme)
+    localStorage.setItem('empresariossa-theme', theme)
+  }, [theme])
+
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    localStorage.setItem('empresariossa-theme', newTheme)
+    setTheme(prev => prev === 'light' ? 'dark' : 'light')
   }
 
   return (

@@ -1,0 +1,47 @@
+## AREA MEMBRI (16 pagine)
+/membros/page.tsx                    → Dashboard membri
+/membros/rede/page.tsx              → Network/contacts
+/membros/eventos/page.tsx           → Events calendar  
+/membros/cadastrar-convidados/page.tsx → Guest registration
+/membros/indicacoes/page.tsx        → Referrals
+/membros/negocios/page.tsx          → Business CRM
+/membros/pontuacao/page.tsx         → Points overview
+/membros/pontuacao/meus/page.tsx    → My points
+/membros/pontuacao/ranking/page.tsx → Leaderboard
+/membros/pontuacao/historico/page.tsx → Points history
+/membros/pontuacao/regras/page.tsx  → Points rules
+/membros/perfil/page.tsx            → Profile overview
+/membros/perfil/dados/page.tsx      → Personal data
+/membros/perfil/config/page.tsx     → Settings
+/membros/gestao-pontuacao/page.tsx  → Points management
+/membros/aprovacao/page.tsx         → Approvals
+
+## AREA ADMIN (12 paginas)
+/page.tsx                           → Admin dashboard
+/(dashboard)/users/page.tsx         → User management
+/config/usuarios/page.tsx           → User config
+/config/niveis/page.tsx             → Level config
+/config/planos/page.tsx             → Plan config  
+/config/ramos/page.tsx              → Branch config
+/marketing/anuncios/page.tsx        → Ads management
+/marketing/artigos/page.tsx         → Articles
+/marketing/aulas/page.tsx           → Classes
+/marketing/patrocinadores/page.tsx  → Sponsors
+/eventos/page.tsx                   → Admin events
+/financeiro/page.tsx                → Financial
+
+## OUTROS (13 páginas)
+/login/page.tsx                     → Authentication
+/calendar/page.tsx                  → Calendar
+/unidades/page.tsx                  → Units
+/reports/page.tsx                   → Reports
+/relatorio/page.tsx                 → Reports alt
+/events/page.tsx                    → Events alt
+/member/page.tsx                    → Member alt
+/(member)/page.tsx                  → Member legacy
+/test-member/page.tsx               → Test page
+/membros/consulta/page.tsx          → Member lookup
+/membros/convidados/page.tsx        → Guests
+/membros/leads/page.tsx             → Leads
+/membros/pagamentos/page.tsx        → Payments
+/membros/regras/page.tsx            → Rules

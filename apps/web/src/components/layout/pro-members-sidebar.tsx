@@ -16,7 +16,10 @@ import {
   ChevronDown,
   ChevronRight,
   Star,
-  Award
+  Award,
+  UserPlus,
+  UserCheck,
+  BookOpen
 } from "lucide-react"
 
 const membersNavigation = [
@@ -39,6 +42,18 @@ const membersNavigation = [
     color: "#8b5cf6"
   },
   {
+    name: "Cadastrar Convidados",
+    href: "/membros/cadastrar-convidados",
+    icon: UserPlus,
+    color: "#8b5cf6"
+  },
+  {
+    name: "Indicações",
+    href: "/membros/indicacoes",
+    icon: UserCheck,
+    color: "#8b5cf6"
+  },
+  {
     name: "Negócios",
     href: "/membros/negocios",
     icon: Briefcase,
@@ -52,7 +67,8 @@ const membersNavigation = [
     submenu: [
       { name: "Meus Pontos", href: "/membros/pontuacao/meus" },
       { name: "Ranking", href: "/membros/pontuacao/ranking" },
-      { name: "Histórico", href: "/membros/pontuacao/historico" }
+      { name: "Histórico", href: "/membros/pontuacao/historico" },
+      { name: "Regras de Pontuação", href: "/membros/pontuacao/regras" }
     ]
   },
   {
@@ -144,10 +160,11 @@ export function ProMembersSidebar() {
       <div style={{
         padding: '20px 24px',
         borderBottom: `1px solid ${colors.border.primary}`,
-        height: '72px',
+        minHeight: '72px',
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: colors.bg.primary,
+        backgroundColor: colors.bg.sidebar,
+        flexShrink: 0,
         transition: 'all 0.3s ease'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -193,7 +210,11 @@ export function ProMembersSidebar() {
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        backgroundColor: colors.bg.sidebar,
+        scrollbarWidth: 'thin',
+        scrollbarColor: `${colors.border.primary} transparent`
       }}>
         {membersNavigation.map((item) => {
           const isActive = item.href ? pathname === item.href : false
@@ -358,6 +379,9 @@ export function ProMembersSidebar() {
             </div>
           )
         })}
+        
+        {/* Spazio aggiuntivo per evitare che l'ultimo elemento tocchi il fondo */}
+        <div style={{ height: '32px' }}></div>
       </nav>
     </div>
   )
