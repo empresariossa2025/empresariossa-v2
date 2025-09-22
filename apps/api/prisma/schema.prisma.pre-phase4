@@ -43,16 +43,6 @@ model User {
   timeAtuation            String?             // Laravel users.time_atuation
   allowsContact           Boolean   @default(true) // Laravel users.allows_contact
   urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   branchId          String?
   cellPhone         String?
   companieCnpj      String?
@@ -112,16 +102,6 @@ model Organization {
   timeAtuation            String?             // Laravel users.time_atuation
   allowsContact           Boolean   @default(true) // Laravel users.allows_contact
   urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   branches  Branch[]
   contracts Contract[]
   members   OrganizationMember[]
@@ -185,16 +165,6 @@ model Contract {
   timeAtuation            String?             // Laravel users.time_atuation
   allowsContact           Boolean   @default(true) // Laravel users.allows_contact
   urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   charges        Charge[]
   organization   Organization   @relation(fields: [organizationId], references: [id])
   user           User           @relation(fields: [userId], references: [id])
@@ -316,16 +286,6 @@ model MemberPoints {
   timeAtuation            String?             // Laravel users.time_atuation
   allowsContact           Boolean   @default(true) // Laravel users.allows_contact
   urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   member        User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   @@map("member_points")
@@ -447,16 +407,6 @@ model Business {
   timeAtuation            String?             // Laravel users.time_atuation
   allowsContact           Boolean   @default(true) // Laravel users.allows_contact
   urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   member        User     @relation(fields: [memberId], references: [id])
 
   @@map("businesses")
@@ -492,16 +442,6 @@ model Level {
   timeAtuation            String?             // Laravel users.time_atuation
   allowsContact           Boolean   @default(true) // Laravel users.allows_contact
   urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
 
   @@map("levels")
 }

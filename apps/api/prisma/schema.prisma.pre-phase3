@@ -31,28 +31,6 @@ model User {
   avatar        String?             // Laravel users.avatar
   logo          String?             // Laravel users.logo
   movie         String?             // Laravel users.movie
-
-  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
-  funcCompanie            String?             // Laravel users.func_companie
-  companieDescription     String?             // Laravel users.companie_description
-  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
-  amountEmployees         BigInt?             // Laravel users.amount_employees
-  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
-  groupExpectation        String?             // Laravel users.group_expectation
-  specificActivity        String?             // Laravel users.specific_activity
-  timeAtuation            String?             // Laravel users.time_atuation
-  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
-  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   branchId          String?
   cellPhone         String?
   companieCnpj      String?
@@ -100,28 +78,6 @@ model Organization {
   avatar        String?             // Laravel users.avatar
   logo          String?             // Laravel users.logo
   movie         String?             // Laravel users.movie
-
-  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
-  funcCompanie            String?             // Laravel users.func_companie
-  companieDescription     String?             // Laravel users.companie_description
-  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
-  amountEmployees         BigInt?             // Laravel users.amount_employees
-  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
-  groupExpectation        String?             // Laravel users.group_expectation
-  specificActivity        String?             // Laravel users.specific_activity
-  timeAtuation            String?             // Laravel users.time_atuation
-  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
-  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   branches  Branch[]
   contracts Contract[]
   members   OrganizationMember[]
@@ -173,28 +129,6 @@ model Contract {
   avatar        String?             // Laravel users.avatar
   logo          String?             // Laravel users.logo
   movie         String?             // Laravel users.movie
-
-  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
-  funcCompanie            String?             // Laravel users.func_companie
-  companieDescription     String?             // Laravel users.companie_description
-  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
-  amountEmployees         BigInt?             // Laravel users.amount_employees
-  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
-  groupExpectation        String?             // Laravel users.group_expectation
-  specificActivity        String?             // Laravel users.specific_activity
-  timeAtuation            String?             // Laravel users.time_atuation
-  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
-  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   charges        Charge[]
   organization   Organization   @relation(fields: [organizationId], references: [id])
   user           User           @relation(fields: [userId], references: [id])
@@ -304,28 +238,6 @@ model MemberPoints {
   avatar        String?             // Laravel users.avatar
   logo          String?             // Laravel users.logo
   movie         String?             // Laravel users.movie
-
-  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
-  funcCompanie            String?             // Laravel users.func_companie
-  companieDescription     String?             // Laravel users.companie_description
-  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
-  amountEmployees         BigInt?             // Laravel users.amount_employees
-  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
-  groupExpectation        String?             // Laravel users.group_expectation
-  specificActivity        String?             // Laravel users.specific_activity
-  timeAtuation            String?             // Laravel users.time_atuation
-  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
-  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   member        User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   @@map("member_points")
@@ -435,28 +347,6 @@ model Business {
   avatar        String?             // Laravel users.avatar
   logo          String?             // Laravel users.logo
   movie         String?             // Laravel users.movie
-
-  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
-  funcCompanie            String?             // Laravel users.func_companie
-  companieDescription     String?             // Laravel users.companie_description
-  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
-  amountEmployees         BigInt?             // Laravel users.amount_employees
-  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
-  groupExpectation        String?             // Laravel users.group_expectation
-  specificActivity        String?             // Laravel users.specific_activity
-  timeAtuation            String?             // Laravel users.time_atuation
-  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
-  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
   member        User     @relation(fields: [memberId], references: [id])
 
   @@map("businesses")
@@ -480,28 +370,6 @@ model Level {
   avatar        String?             // Laravel users.avatar
   logo          String?             // Laravel users.logo
   movie         String?             // Laravel users.movie
-
-  // === FASE 3: LARAVEL COMPANY EXTENDED FIELDS ===
-  funcCompanie            String?             // Laravel users.func_companie
-  companieDescription     String?             // Laravel users.companie_description
-  companieInvoicing       Decimal?  @db.Decimal(10,2) // Laravel users.companie_invoicing
-  amountEmployees         BigInt?             // Laravel users.amount_employees
-  listPartnershipsClients String?             // Laravel users.list_partnerships_clients
-  groupExpectation        String?             // Laravel users.group_expectation
-  specificActivity        String?             // Laravel users.specific_activity
-  timeAtuation            String?             // Laravel users.time_atuation
-  allowsContact           Boolean   @default(true) // Laravel users.allows_contact
-  urgencySchedule         BigInt?             // Laravel users.urgency_schedule
-
-  // === FASE 4: LARAVEL SOCIAL MEDIA FIELDS ===
-  website       String?             // Laravel users.website
-  linkedIn      String?             // Laravel users.linkedIn
-  twitter       String?             // Laravel users.twitter
-  instagram     String?             // Laravel users.instagram
-  facebook      String?             // Laravel users.facebook
-  kwai          String?             // Laravel users.kwai
-  youtube       String?             // Laravel users.youtube
-  tiktok        String?             // Laravel users.tiktok
 
   @@map("levels")
 }
